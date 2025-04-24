@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <title>Quick Tip</title>
+</head>
+<body>
+    <main input id="container">
+        <h1>Quick Tip</h1>
+        <section>
+            <div class="bill">
+                <label for ="yourBill">Bill</label>
+                <input type="number" placeholder="Your bill" id ="yourBill"/>
+            </div>
+             <div>
+                <div class="space-between">
+                    <label for="tipInput">Select tip</label>
+                    <span id="tipPercent"></span>
+                </div>
+            <input type="range" value="0" id="tipInput" class="range">
+            </div>
+                <div class="space-between">
+                    <span>Tip</span>
+                    <span id="tipValue"></span>
+                </div>
+                <hr>
+                <div class="space-between total">
+                    <span>Total</span>
+                    <span id="totalWithTip"></span>
+                </div>
+        </section>
+        <section>
+            <div>
+                <div class="space-between">
+                    <label for="splitInput">Slipt</label>
+                    <span id="splitValue"></span>
+                </div>
+                <input type="range" min="1" max="10" value="1" id="splitInput" class="range">
+            </div>
+            <div class="space-between">
+                <span>Bill each</span>
+                <span id="billEach"></span>
+            </div>
+            <div class="space-between"></divclass>
+                <span>Tip each</span>
+                <span id="tipEach"></span>
+            </div>
+        </section>
+    </main>
+    <script>
+        // formats the money to be rounded up and to have the correct Symbol
+        function formatMoney(value){
+            value = Math.ceil(value * 100) / 100;
+            value = value.toFixed(2);
+            return"€ " + value;
+        }
+        function formatSplit(value) {
+            if(value==="1") return value + " person";
+            return value + " people";
+         }
+        // updates the values
+        function update(){
+        let bill = Number(document.getElementById("yourBill").value);
+        let tipPercent = document.getElementById("tipInput").value;
+        let split = document.getElementById("splitInput").value;
+    //    does the calculations
+        let tipValue = bill * (tipPercent / 100);
+        let tipEach = tipValue / split;
+        let newBillEach = (bill + tipValue) / split;
+            
+    document.getElementById("tipPercent").innerHTML = tipPercent + "%";
+    document.getElementById("tipValue").innerHTML = formatMoney(tipValue);
+    document.getElementById("totalWithTip").innerHTML = formatMoney(bill + tipValue);
+    document.getElementById("splitValue").innerHTML = formatSplit(split);
+    document.getElementById("billEach").innerHTML = formatMoney(newBillEach);
+    document.getElementById("tipEach").innerHTML = formatMoney(tipEach);
+
+    }
+        let container = document.getElementById("container");
+        container.addEventListener("input",update);
+    </script>
+
+        <!-- Saves the bill -->
+<button id="saveReceipt">Save Receipt</button>
+<script>
+    function saveReceipt() {
+        let bill = Number(document.getElementById("yourBill").value);
+        let tipPercent = document.getElementById("tipInput").value;
+        let split = document.getElementById("splitInput").value;
+
+        let tipValue = bill * (tipPercent / 100);
+        let totalWithTip = bill + tipValue;
+        let billEach = totalWithTip / split;
+        let tipEach = tipValue / split;
+
+        let receiptContent = `
+        --- Quick Tip Receipt ---
+        Bill Amount: €${bill.toFixed(2)}
+        Tip Percentage: ${tipPercent}%
+        Tip Amount: €${tipValue.toFixed(2)}
+        Total (Bill + Tip): €${totalWithTip.toFixed(2)}
+
+        Split Between: ${split} ${split == 1 ? 'person' : 'people'}
+        Each Person Pays: €${billEach.toFixed(2)}
+        Tip Per Person: €${tipEach.toFixed(2)}
+        -------------------------
+        Thank you for the tip!
+        `;
+
+        let blob = new Blob([receiptContent], { type: "text/plain" });
+        let a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "receipt.txt";
+        a.click();
+    }
+    document.getElementById("saveReceipt").addEventListener("click", saveReceipt);
+</script>
+</body>
+</html>
